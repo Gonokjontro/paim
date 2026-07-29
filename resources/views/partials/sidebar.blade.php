@@ -1,20 +1,20 @@
-<aside class="w-64 paim-sidebar flex-shrink-0 flex flex-col justify-between sticky top-0 h-screen z-40">
-    <div>
-        <!-- Logo & Branding -->
-        <div class="h-20 flex items-center px-6 border-b border-slate-200 dark:border-slate-800/80">
-            <a href="{{ route('dashboard') }}" class="flex items-center gap-3 group">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
-                    <i class="bi bi-cpu-fill text-xl text-white"></i>
-                </div>
-                <div>
-                    <span class="text-xl font-extrabold tracking-tight text-indigo-600 dark:gradient-text">PAIM</span>
-                    <span class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">AI Subscription Control</span>
-                </div>
-            </a>
-        </div>
+<aside class="w-64 paim-sidebar flex-shrink-0 flex flex-col sticky top-0 h-screen z-40 border-r border-slate-200 dark:border-slate-800/80">
+    <!-- Logo & Branding (Fixed Header) -->
+    <div class="h-20 flex-shrink-0 flex items-center px-6 border-b border-slate-200 dark:border-slate-800/80">
+        <a href="{{ route('dashboard') }}" class="flex items-center gap-3 group">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
+                <i class="bi bi-cpu-fill text-xl text-white"></i>
+            </div>
+            <div>
+                <span class="text-xl font-extrabold tracking-tight text-indigo-600 dark:gradient-text">PAIM</span>
+                <span class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">AI Subscription Control</span>
+            </div>
+        </a>
+    </div>
 
-        <!-- Navigation Links -->
-        <nav class="p-4 space-y-1.5">
+    <!-- Navigation Links (Scrollable Middle Section) -->
+    <div class="flex-1 overflow-y-auto p-4 paim-custom-scroll space-y-1.5 min-h-0">
+        <nav class="space-y-1.5">
             <a href="{{ route('dashboard') }}" class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm transition-all {{ request()->routeIs('dashboard') ? 'paim-nav-active' : 'paim-nav-inactive' }}">
                 <i class="bi bi-grid-1x2-fill text-lg"></i>
                 <span>Dashboard</span>
@@ -89,8 +89,8 @@
         </nav>
     </div>
 
-    <!-- Active User Profile Card -->
-    <div class="p-4 border-t border-slate-200 dark:border-slate-800/80">
+    <!-- Active User Profile Card (Fixed Footer) -->
+    <div class="p-4 flex-shrink-0 border-t border-slate-200 dark:border-slate-800/80">
         <a href="{{ route('profile.index') }}" class="p-3 rounded-xl paim-card flex items-center gap-3 hover:opacity-90 transition-opacity">
             <img src="{{ auth()->user()->avatar }}" alt="{{ auth()->user()->name }}" class="w-10 h-10 rounded-xl object-cover border border-indigo-500">
             <div class="min-w-0 flex-1">

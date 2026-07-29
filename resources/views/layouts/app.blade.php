@@ -57,6 +57,21 @@
             transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
         }
 
+        /* Smooth Custom Scrollbars */
+        .paim-custom-scroll::-webkit-scrollbar {
+            width: 5px;
+        }
+        .paim-custom-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .paim-custom-scroll::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.25);
+            border-radius: 9999px;
+        }
+        .paim-custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.6);
+        }
+
         /* ----------------------------------------------------
            LIGHT MODE DESIGN SYSTEM RULES
         ---------------------------------------------------- */
