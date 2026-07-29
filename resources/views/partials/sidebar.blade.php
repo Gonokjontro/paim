@@ -25,9 +25,19 @@
                 <span>Subscriptions</span>
             </a>
 
+            <a href="{{ route('calendar.index') }}" class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm transition-all {{ request()->routeIs('calendar.*') ? 'paim-nav-active' : 'paim-nav-inactive' }}">
+                <i class="bi bi-calendar-event-fill text-lg"></i>
+                <span>Renewal Calendar</span>
+            </a>
+
             <a href="{{ route('usage.index') }}" class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm transition-all {{ request()->routeIs('usage.*') ? 'paim-nav-active' : 'paim-nav-inactive' }}">
                 <i class="bi bi-lightning-charge-fill text-lg"></i>
                 <span>Token & Usage Ledger</span>
+            </a>
+
+            <a href="{{ route('projects.index') }}" class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm transition-all {{ request()->routeIs('projects.*') ? 'paim-nav-active' : 'paim-nav-inactive' }}">
+                <i class="bi bi-folder-symlink-fill text-lg"></i>
+                <span>Projects & Tax Write-off</span>
             </a>
 
             <a href="{{ route('payment-accounts.index') }}" class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm transition-all {{ request()->routeIs('payment-accounts.*') ? 'paim-nav-active' : 'paim-nav-inactive' }}">
@@ -64,6 +74,11 @@
             <a href="{{ route('permissions.index') }}" class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm transition-all {{ request()->routeIs('permissions.*') ? 'paim-nav-active' : 'paim-nav-inactive' }}">
                 <i class="bi bi-shield-lock-fill text-lg"></i>
                 <span>Role Permissions</span>
+            </a>
+
+            <a href="{{ route('webhooks.index') }}" class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm transition-all {{ request()->routeIs('webhooks.*') ? 'paim-nav-active' : 'paim-nav-inactive' }}">
+                <i class="bi bi-bell-fill text-lg"></i>
+                <span>Webhook Alerting</span>
             </a>
 
             <a href="{{ route('settings.index') }}" class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm transition-all {{ request()->routeIs('settings.*') ? 'paim-nav-active' : 'paim-nav-inactive' }}">

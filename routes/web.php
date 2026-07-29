@@ -12,6 +12,9 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\WebhookController;
+use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\ProjectController;
 
 // Auth Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -20,15 +23,27 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Authenticated & Protected Routes
 Route::middleware(['auth'])->group(function () {
-    // Dashboard Overview (All roles: Admin, Manager, Viewer)
+    // Dashboard Overview
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Profile & Password Change (All authenticated users)
+    // Profile & Password Change
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
     Route::post('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
     Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
 
-    // Subscriptions (Viewable by all, Mutations for Admin & Manager)
+    // Feature 4: Interactive Renewal Timeline Calendar & iCal Export
+    Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
+    Route::get('/calendar/export.ics', [CalendarController::class, 'exportIcal'])->name('calendar.export-ical');
+
+    // Feature 5: Team & Project Cost Allocation & Tax Reports
+    Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
+    Route::get('/projects/export-tax-report', [ProjectController::class, 'exportTaxReport'])->name('projects.export-tax');
+    Route::middleware(['role:admin,manager'])->group(function () {
+        Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
+        Route::post('/projects/allocate', [ProjectController::class, 'allocate'])->name('projects.allocate');
+    });
+
+    // Subscriptions
     Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('subscriptions.index');
     Route::get('/subscriptions/{subscription}', [SubscriptionController::class, 'show'])->name('subscriptions.show');
     Route::middleware(['role:admin,manager'])->group(function () {
@@ -36,14 +51,14 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/subscriptions/{id}/status', [SubscriptionController::class, 'updateStatus'])->name('subscriptions.update-status');
     });
 
-    // Token & Usage Ledger (Viewable by all, Log & Purchase for Admin & Manager)
+    // Token & Usage Ledger
     Route::get('/usage', [UsageController::class, 'index'])->name('usage.index');
     Route::middleware(['role:admin,manager'])->group(function () {
         Route::post('/usage/store', [UsageController::class, 'storeUsage'])->name('usage.store');
         Route::post('/usage/package', [UsageController::class, 'storePackage'])->name('usage.store-package');
     });
 
-    // Payment Accounts (Viewable by all, Add for Admin & Manager, Reassign/Replace for Admin)
+    // Payment Accounts
     Route::get('/payment-accounts', [PaymentAccountController::class, 'index'])->name('payment-accounts.index');
     Route::middleware(['role:admin,manager'])->group(function () {
         Route::post('/payment-accounts', [PaymentAccountController::class, 'store'])->name('payment-accounts.store');
@@ -52,14 +67,14 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/payment-accounts/{id}/replace', [PaymentAccountController::class, 'replace'])->name('payment-accounts.replace');
     });
 
-    // Budgets & Alerts (Viewable by all, Create Target for Admin & Manager)
+    // Budgets & Alerts
     Route::get('/targets', [TargetAlertController::class, 'index'])->name('targets.index');
     Route::middleware(['role:admin,manager'])->group(function () {
         Route::post('/targets', [TargetAlertController::class, 'storeTarget'])->name('targets.store');
         Route::post('/alerts/{id}/acknowledge', [TargetAlertController::class, 'acknowledgeAlert'])->name('alerts.acknowledge');
     });
 
-    // Import & Audit Trail (Viewable by all, Batch Import Execution for Admin)
+    // Import & Audit Trail
     Route::get('/import', [ImportController::class, 'index'])->name('import.index');
     Route::middleware(['role:admin'])->group(function () {
         Route::post('/import', [ImportController::class, 'process'])->name('import.process');
@@ -67,6 +82,12 @@ Route::middleware(['auth'])->group(function () {
 
     // System Administration Modules (ADMIN ONLY)
     Route::middleware(['role:admin'])->group(function () {
+        // Feature 3: Multi-Channel Webhooks
+        Route::get('/webhooks', [WebhookController::class, 'index'])->name('webhooks.index');
+        Route::post('/webhooks', [WebhookController::class, 'store'])->name('webhooks.store');
+        Route::post('/webhooks/{id}/test', [WebhookController::class, 'test'])->name('webhooks.test');
+        Route::delete('/webhooks/{id}', [WebhookController::class, 'destroy'])->name('webhooks.destroy');
+
         // Workspace Settings & System Config
         Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
         Route::post('/settings/workspace', [SettingsController::class, 'updateWorkspace'])->name('settings.update-workspace');
