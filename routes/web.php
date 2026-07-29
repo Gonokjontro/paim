@@ -15,27 +15,55 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\SuperAdminController;
+use App\Http\Controllers\ReportsController;
 
 // Auth Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Authenticated & Protected Routes
+// Super Admin SaaS Platform Operator Portal (SUPER ADMIN ONLY)
+Route::middleware(['auth', 'super_admin'])->prefix('super-admin')->group(function () {
+    Route::get('/', [SuperAdminController::class, 'dashboard'])->name('superadmin.dashboard');
+    
+    // Organizations Tenant Control
+    Route::get('/organizations', [SuperAdminController::class, 'organizations'])->name('superadmin.organizations');
+    Route::post('/organizations', [SuperAdminController::class, 'storeOrganization'])->name('superadmin.organizations.store');
+    Route::post('/organizations/{id}', [SuperAdminController::class, 'updateOrganization'])->name('superadmin.organizations.update');
+    Route::post('/organizations/{id}/status', [SuperAdminController::class, 'toggleOrganizationStatus'])->name('superadmin.organizations.toggle-status');
+
+    // Global Organization User Management
+    Route::get('/users', [SuperAdminController::class, 'users'])->name('superadmin.users');
+    Route::post('/users', [SuperAdminController::class, 'storeUser'])->name('superadmin.users.store');
+    Route::post('/users/{id}/reset-password', [SuperAdminController::class, 'resetUserPassword'])->name('superadmin.users.reset-password');
+    Route::post('/users/{id}/regenerate-password', [SuperAdminController::class, 'regenerateUserPassword'])->name('superadmin.users.regenerate-password');
+    Route::post('/users/{id}/toggle-status', [SuperAdminController::class, 'toggleUserStatus'])->name('superadmin.users.toggle-status');
+
+    // Global SaaS Analytics & Settings
+    Route::get('/analytics', [SuperAdminController::class, 'analytics'])->name('superadmin.analytics');
+    Route::get('/settings', [SuperAdminController::class, 'settings'])->name('superadmin.settings');
+});
+
+// Authenticated Organization & Workspace Routes
 Route::middleware(['auth'])->group(function () {
     // Dashboard Overview
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Organization-Wise Reports
+    Route::get('/reports', [ReportsController::class, 'index'])->name('reports.index');
+    Route::get('/reports/export-csv', [ReportsController::class, 'exportCsv'])->name('reports.export-csv');
 
     // Profile & Password Change
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
     Route::post('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
     Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
 
-    // Feature 4: Interactive Renewal Timeline Calendar & iCal Export
+    // Interactive Renewal Calendar & iCal Export
     Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
     Route::get('/calendar/export.ics', [CalendarController::class, 'exportIcal'])->name('calendar.export-ical');
 
-    // Feature 5: Team & Project Cost Allocation & Tax Reports
+    // Projects & Tax Reports
     Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
     Route::get('/projects/export-tax-report', [ProjectController::class, 'exportTaxReport'])->name('projects.export-tax');
     Route::middleware(['role:admin,manager'])->group(function () {
@@ -82,13 +110,11 @@ Route::middleware(['auth'])->group(function () {
 
     // System Administration Modules (ADMIN ONLY)
     Route::middleware(['role:admin'])->group(function () {
-        // Feature 3: Multi-Channel Webhooks
         Route::get('/webhooks', [WebhookController::class, 'index'])->name('webhooks.index');
         Route::post('/webhooks', [WebhookController::class, 'store'])->name('webhooks.store');
         Route::post('/webhooks/{id}/test', [WebhookController::class, 'test'])->name('webhooks.test');
         Route::delete('/webhooks/{id}', [WebhookController::class, 'destroy'])->name('webhooks.destroy');
 
-        // Workspace Settings & System Config
         Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
         Route::post('/settings/workspace', [SettingsController::class, 'updateWorkspace'])->name('settings.update-workspace');
         Route::post('/settings/categories', [SettingsController::class, 'storeCategory'])->name('settings.store-category');
@@ -100,7 +126,6 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/settings/meter-units', [SettingsController::class, 'storeMeterUnit'])->name('settings.store-meter-unit');
         Route::delete('/settings/meter-units/{id}', [SettingsController::class, 'deleteMeterUnit'])->name('settings.delete-meter-unit');
 
-        // User Management Directory & Roles
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
         Route::post('/users', [UserController::class, 'store'])->name('users.store');
         Route::post('/users/{id}/role', [UserController::class, 'updateRole'])->name('users.update-role');
@@ -109,7 +134,6 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/users/{id}/regenerate-password', [UserController::class, 'regeneratePassword'])->name('users.regenerate-password');
         Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
 
-        // Granular Role Permission Matrix
         Route::get('/permissions', [PermissionController::class, 'index'])->name('permissions.index');
         Route::post('/permissions', [PermissionController::class, 'updateMatrix'])->name('permissions.update');
     });

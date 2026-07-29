@@ -15,9 +15,10 @@ class AuthController extends Controller
         }
 
         $demoUsers = [
-            ['role' => 'Admin', 'email' => 'admin@paim.ai', 'password' => 'password', 'desc' => 'Full CRUD, User & System Control'],
-            ['role' => 'Manager', 'email' => 'manager@paim.ai', 'password' => 'password', 'desc' => 'Manage Subscriptions, Usage & Accounts'],
-            ['role' => 'Viewer', 'email' => 'viewer@paim.ai', 'password' => 'password', 'desc' => 'Read-Only View of Dashboards & Reports'],
+            ['role' => 'Super Admin', 'email' => 'superadmin@paim.ai', 'password' => 'password', 'desc' => 'Global SaaS Operator Platform Control'],
+            ['role' => 'Admin', 'email' => 'admin@paim.ai', 'password' => 'password', 'desc' => 'Acme Corp Org Admin (Full Control)'],
+            ['role' => 'Manager', 'email' => 'manager@paim.ai', 'password' => 'password', 'desc' => 'Acme Corp Org Manager (Operations)'],
+            ['role' => 'Viewer', 'email' => 'viewer@paim.ai', 'password' => 'password', 'desc' => 'Acme Corp Org Viewer (Read-Only)'],
         ];
 
         return view('auth.login', compact('demoUsers'));
@@ -39,6 +40,11 @@ class AuthController extends Controller
             }
 
             $request->session()->regenerate();
+
+            if (Auth::user()->isSuperAdmin()) {
+                return redirect()->intended(route('superadmin.dashboard'))->with('success', 'Logged in as Super Admin Operator.');
+            }
+
             return redirect()->intended(route('dashboard'))->with('success', 'Logged in successfully as ' . Auth::user()->name . ' (' . ucfirst(Auth::user()->role) . ').');
         }
 

@@ -7,7 +7,7 @@
             </div>
             <div>
                 <span class="text-xl font-extrabold tracking-tight text-indigo-600 dark:gradient-text">PAIM</span>
-                <span class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">AI Subscription Control</span>
+                <span class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">B2B SaaS Platform</span>
             </div>
         </a>
     </div>
@@ -23,6 +23,11 @@
             <a href="{{ route('subscriptions.index') }}" class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm transition-all {{ request()->routeIs('subscriptions.*') ? 'paim-nav-active' : 'paim-nav-inactive' }}">
                 <i class="bi bi-card-checklist text-lg"></i>
                 <span>Subscriptions</span>
+            </a>
+
+            <a href="{{ route('reports.index') }}" class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm transition-all {{ request()->routeIs('reports.*') ? 'paim-nav-active' : 'paim-nav-inactive' }}">
+                <i class="bi bi-bar-chart-line-fill text-lg"></i>
+                <span>Org Spend Reports</span>
             </a>
 
             <a href="{{ route('calendar.index') }}" class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm transition-all {{ request()->routeIs('calendar.*') ? 'paim-nav-active' : 'paim-nav-inactive' }}">
@@ -60,15 +65,37 @@
                 <span>My Profile & Password</span>
             </a>
 
-            @if(auth()->user()->role === 'admin')
-            <!-- Admin Only Section Divider -->
-            <div class="pt-3 pb-1 px-4 text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                Administration
+            @if(auth()->user()->isSuperAdmin())
+            <!-- Super Admin SaaS Operator Section Divider -->
+            <div class="pt-4 pb-1 px-4 text-[10px] font-extrabold uppercase tracking-wider text-amber-500 dark:text-amber-400 flex items-center gap-1.5">
+                <i class="bi bi-shield-fill-check"></i> Super Admin SaaS
+            </div>
+
+            <a href="{{ route('superadmin.dashboard') }}" class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm transition-all {{ request()->routeIs('superadmin.dashboard') ? 'paim-nav-active' : 'paim-nav-inactive' }}">
+                <i class="bi bi-speedometer text-lg"></i>
+                <span>SaaS Platform Control</span>
+            </a>
+
+            <a href="{{ route('superadmin.organizations') }}" class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm transition-all {{ request()->routeIs('superadmin.organizations*') ? 'paim-nav-active' : 'paim-nav-inactive' }}">
+                <i class="bi bi-building-fill text-lg"></i>
+                <span>Customer Tenants</span>
+            </a>
+
+            <a href="{{ route('superadmin.users') }}" class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm transition-all {{ request()->routeIs('superadmin.users*') ? 'paim-nav-active' : 'paim-nav-inactive' }}">
+                <i class="bi bi-people-fill text-lg"></i>
+                <span>Global Tenant Users</span>
+            </a>
+            @endif
+
+            @if(auth()->user()->role === 'admin' || auth()->user()->isSuperAdmin())
+            <!-- Organization Admin Section Divider -->
+            <div class="pt-4 pb-1 px-4 text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                Organization Admin
             </div>
 
             <a href="{{ route('users.index') }}" class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm transition-all {{ request()->routeIs('users.*') ? 'paim-nav-active' : 'paim-nav-inactive' }}">
-                <i class="bi bi-people-fill text-lg"></i>
-                <span>User Management</span>
+                <i class="bi bi-person-badge-fill text-lg"></i>
+                <span>Org User Directory</span>
             </a>
 
             <a href="{{ route('permissions.index') }}" class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm transition-all {{ request()->routeIs('permissions.*') ? 'paim-nav-active' : 'paim-nav-inactive' }}">
@@ -95,7 +122,9 @@
             <img src="{{ auth()->user()->avatar }}" alt="{{ auth()->user()->name }}" class="w-10 h-10 rounded-xl object-cover border border-indigo-500">
             <div class="min-w-0 flex-1">
                 <span class="block text-sm font-bold paim-title leading-tight truncate">{{ auth()->user()->name ?? 'User' }}</span>
-                <span class="block text-[11px] font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">{{ auth()->user()->role ?? 'User' }}</span>
+                <span class="block text-[11px] font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                    {{ auth()->user()->organization ? auth()->user()->organization->name : 'Platform Owner' }}
+                </span>
             </div>
         </a>
     </div>

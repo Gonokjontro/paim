@@ -12,6 +12,7 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $fillable = [
+        'organization_id',
         'workspace_id',
         'name',
         'email',
@@ -36,9 +37,19 @@ class User extends Authenticatable
         ];
     }
 
+    public function organization(): BelongsTo
+    {
+        return $this->belongsTo(Organization::class);
+    }
+
     public function workspace(): BelongsTo
     {
         return $this->belongsTo(Workspace::class);
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin';
     }
 
     public function getAvatarAttribute(): string
@@ -51,7 +62,7 @@ class User extends Authenticatable
 
     public function hasPermission(string $permissionKey): bool
     {
-        if ($this->role === 'admin') {
+        if ($this->role === 'super_admin' || $this->role === 'admin') {
             return true;
         }
 

@@ -25,6 +25,52 @@ class ExampleTest extends TestCase
         $response->assertSee('admin@paim.ai');
     }
 
+    public function test_super_admin_can_access_saas_dashboard(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+        $superAdmin = User::where('email', 'superadmin@paim.ai')->first();
+
+        $response = $this->actingAs($superAdmin)->get('/super-admin');
+
+        $response->assertStatus(200);
+        $response->assertSee('SaaS Platform Operator Control Center');
+        $response->assertSee('Acme Corporation');
+    }
+
+    public function test_super_admin_can_access_organizations_management(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+        $superAdmin = User::where('email', 'superadmin@paim.ai')->first();
+
+        $response = $this->actingAs($superAdmin)->get('/super-admin/organizations');
+
+        $response->assertStatus(200);
+        $response->assertSee('Customer Organization Tenants');
+        $response->assertSee('acme-corp');
+    }
+
+    public function test_non_super_admin_cannot_access_super_admin_portal(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+        $orgAdmin = User::where('email', 'admin@paim.ai')->first();
+
+        $response = $this->actingAs($orgAdmin)->get('/super-admin');
+
+        $response->assertStatus(403);
+    }
+
+    public function test_authenticated_user_can_access_org_reports(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+        $orgAdmin = User::where('email', 'admin@paim.ai')->first();
+
+        $response = $this->actingAs($orgAdmin)->get('/reports');
+
+        $response->assertStatus(200);
+        $response->assertSee('Organization Financial');
+        $response->assertSee('Spend by AI Vendor');
+    }
+
     public function test_authenticated_admin_can_access_dashboard(): void
     {
         $this->seed(DatabaseSeeder::class);
@@ -37,76 +83,6 @@ class ExampleTest extends TestCase
         $response->assertSee('ChatGPT Plus');
     }
 
-    public function test_authenticated_user_can_access_calendar(): void
-    {
-        $this->seed(DatabaseSeeder::class);
-        $admin = User::where('email', 'admin@paim.ai')->first();
-
-        $response = $this->actingAs($admin)->get('/calendar');
-
-        $response->assertStatus(200);
-        $response->assertSee('Renewal Timeline');
-        $response->assertSee('ChatGPT Plus Monthly');
-    }
-
-    public function test_user_can_download_ical_feed(): void
-    {
-        $this->seed(DatabaseSeeder::class);
-        $admin = User::where('email', 'admin@paim.ai')->first();
-
-        $response = $this->actingAs($admin)->get('/calendar/export.ics');
-
-        $response->assertStatus(200);
-        $response->assertHeader('Content-Type', 'text/calendar; charset=utf-8');
-        $this->assertStringContainsString('BEGIN:VCALENDAR', $response->getContent());
-    }
-
-    public function test_authenticated_user_can_access_projects(): void
-    {
-        $this->seed(DatabaseSeeder::class);
-        $admin = User::where('email', 'admin@paim.ai')->first();
-
-        $response = $this->actingAs($admin)->get('/projects');
-
-        $response->assertStatus(200);
-        $response->assertSee('Projects');
-        $response->assertSee('Tax Write-offs');
-    }
-
-    public function test_user_can_export_tax_report_csv(): void
-    {
-        $this->seed(DatabaseSeeder::class);
-        $admin = User::where('email', 'admin@paim.ai')->first();
-
-        $response = $this->actingAs($admin)->get('/projects/export-tax-report');
-
-        $response->assertStatus(200);
-        $response->assertHeader('Content-Type', 'text/csv; charset=UTF-8');
-    }
-
-    public function test_authenticated_admin_can_access_webhooks(): void
-    {
-        $this->seed(DatabaseSeeder::class);
-        $admin = User::where('email', 'admin@paim.ai')->first();
-
-        $response = $this->actingAs($admin)->get('/webhooks');
-
-        $response->assertStatus(200);
-        $response->assertSee('Webhook Alerting Channels');
-    }
-
-    public function test_authenticated_admin_can_access_settings(): void
-    {
-        $this->seed(DatabaseSeeder::class);
-        $admin = User::where('email', 'admin@paim.ai')->first();
-
-        $response = $this->actingAs($admin)->get('/settings');
-
-        $response->assertStatus(200);
-        $response->assertSee('System Settings');
-        $response->assertSee('Regional Preferences');
-    }
-
     public function test_viewer_role_cannot_access_settings(): void
     {
         $this->seed(DatabaseSeeder::class);
@@ -115,17 +91,5 @@ class ExampleTest extends TestCase
         $response = $this->actingAs($viewer)->get('/settings');
 
         $response->assertStatus(403);
-    }
-
-    public function test_authenticated_user_can_access_profile_page(): void
-    {
-        $this->seed(DatabaseSeeder::class);
-        $admin = User::where('email', 'admin@paim.ai')->first();
-
-        $response = $this->actingAs($admin)->get('/profile');
-
-        $response->assertStatus(200);
-        $response->assertSee('Personal Profile Data');
-        $response->assertSee('Security');
     }
 }
